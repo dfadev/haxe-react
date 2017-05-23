@@ -207,7 +207,7 @@ class Parser {
 			switch item.block {
 
 				case Block.For(e, pos):
-					exprList.push(macro @:pos(pos.pos) [for ($e) ${createExpr(item.children, false)}]);
+					exprList.push(macro @:pos(pos.pos) untyped __js__('[].concat.apply([], {0})', [for ($e) ${createExpr(item.children, false)}]));
 
 				case Block.NullFor(field, e, pos):
 					switch (field.getIdent()) {
@@ -215,7 +215,7 @@ class Parser {
 							exprList.push(macro @:pos(pos.pos) {
 								var t = $e;
 								if (t != null) {
-									t.map(function($i) ${createExpr(item.children, true)});
+									untyped __js__('[].concat.apply([], {0})', t.map(function($i) ${createExpr(item.children, true)}));
 								}
 								else 
 									[];
@@ -261,7 +261,7 @@ class Parser {
 				case Block.Map(a, b, pos):
 					switch b.getIdent() {
 						case Success(i):
-							exprList.push(macro @:pos(pos.pos) $a.map(function($i) ${createExpr(item.children, true)}));
+							exprList.push(macro @:pos(pos.pos) untyped __js__('[].concat.apply([], {0})', $a.map(function($i) ${createExpr(item.children, true)})));
 						default: continue;
 					}
 
@@ -271,7 +271,7 @@ class Parser {
 							exprList.push(macro @:pos(pos.pos) {
 								var t = $a;
 								if (t != null) {
-									t.map(function($i) ${createExpr(item.children, true)});
+									untyped __js__('[].concat.apply([], {0})', t.map(function($i) ${createExpr(item.children, true)}));
 								}
 								else 
 									[];
@@ -280,7 +280,7 @@ class Parser {
 					}
 
 				case Block.While(e, pos):
-					exprList.push(macro @:pos(pos.pos) [while ($e) ${createExpr(item.children, true)}]);
+					exprList.push(macro @:pos(pos.pos) untyped __js__('[].concat.apply([], {0})', [while ($e) ${createExpr(item.children, true)}]));
 
 				case Block.Try(pos):
 					var catchExpr = macro @:pos(pos,pos) [];
@@ -320,42 +320,20 @@ class Parser {
 					switch attrs.expr {
 						case EObjectDecl([]):
 							emptyAttrs = true;
+							attrs = macro { };
 						default:
 					}
 
-					var children = createExpr(item.children, false);
-					var emptyChildren = false;
-					switch children.expr {
-						case EArrayDecl([]):
-							emptyChildren = true;
-						default:
-					}
+					var applyCall:Expr;
+					var childs = createExprList(item.children);
+					if (data.content != null) childs.insert(0, data.content);
 
-					var vnode = null;
-					if (data.content != null) {
-						if (emptyChildren) {
-							if (emptyAttrs)
-								vnode = macro react.React.createElement(${tag}, { }, ${data.content});
-							else
-								vnode = macro react.React.createElement(${tag}, ${attrs}, ${data.content});
-						} else {
-							if (emptyAttrs)
-								vnode = macro react.React.createElement(${tag}, { }, ([${data.content}]:Array<Dynamic>).concat(${children}));
-							else
-								vnode = macro react.React.createElement(${tag}, ${attrs}, ([${data.content}]:Array<Dynamic>).concat(${children}));
-						}
-					} else {
-						if (emptyChildren) {
-							vnode = macro react.React.createElement(${tag}, ${attrs});
-						} else {
-							if (emptyAttrs)
-								vnode = macro react.React.createElement(${tag}, { }, ${children});
-							else
-								vnode = macro react.React.createElement(${tag}, ${attrs}, ${children});
-						}
-					}
-
-					exprList.push(vnode);
+					if (childs.length > 0)
+						applyCall = (macro untyped(react.React.createElement.apply)(this, [ ${tag}, ${attrs} ].concat(untyped __js__('[].concat.apply([], {0})', [$a{childs}]))));
+					else
+						applyCall = (macro react.React.createElement(${tag}, ${attrs}));
+							
+					exprList.push(applyCall);
 
 				case Block.ExprBlock(e, _):
 					exprList.push(e);
@@ -367,28 +345,15 @@ class Parser {
 
 				case Block.CustomElement(name, arguments, pos):
 					var attrs = arguments.length > 0 ? arguments[0] : macro @:pos(pos.pos) {};
-					var children = createExpr(item.children, false);
-					var emptyChildren = false;
-					switch children.expr {
-						case EArrayDecl([]):
-							emptyChildren = true;
-						default:
-					}
-					var emptyAttrs = arguments.length == 0;
+					var applyCall:Expr;
+					var childs = createExprList(item.children);
 
-					if (emptyChildren) {
-						if (emptyAttrs) {
-							exprList.push(macro @:pos(pos.pos) react.React.createElement($i{name}));
-						} else {
-							exprList.push(macro @:pos(pos.pos) react.React.createElement($i{name}, $attrs));
-						}
-					} else {
-						if (emptyAttrs) {
-							exprList.push(macro @:pos(pos.pos) react.React.createElement($i{name}, { }, $children));
-						} else {
-							exprList.push(macro @:pos(pos.pos) react.React.createElement($i{name}, $attrs, $children));
-						}
-					}
+					if (childs.length > 0)
+						applyCall = (macro untyped(react.React.createElement.apply)(this, [ $i{name}, ${attrs} ].concat(untyped __js__('[].concat.apply([], {0})', [$a{childs}]))));
+					else
+						applyCall = (macro react.React.createElement($i{name}, ${attrs}));
+							
+					exprList.push(applyCall);
 			}
 		}
 
