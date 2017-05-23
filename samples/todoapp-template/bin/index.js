@@ -18,7 +18,7 @@ HxOverrides.iter = function(a) {
 var Main = function() { };
 Main.__name__ = true;
 Main.main = function() {
-	ReactDOM.render(React.createElement(view_TodoApp),window.document.getElementById("app"));
+	ReactDOM.render(React.createElement(view_TodoApp,{ }),window.document.getElementById("app"));
 };
 Math.__name__ = true;
 var Reflect = function() { };
@@ -584,16 +584,9 @@ view_TodoApp.prototype = $extend(React.Component.prototype,{
 			return !item.checked;
 		}).length;
 		var listProps = { data : this.state.items};
-		var tmp = React.createElement("input",{ ref : "input", placeholder : "Enter new task description"});
-		var tmp1 = React.createElement("button",{ onClick : $bind(this,this.addItem), className : "button-add"},"+");
-		var tmp2 = React.createElement("div",{ className : "header"},[tmp,tmp1]);
-		var tmp3 = React.createElement("hr",{ });
-		var tmp4 = react_template_Attributes.attrs(listProps);
-		var tmp5 = React.createElement(view_TodoList,react_template_Attributes.combine({ className : "list", ref : $bind(this,this.mountList)},tmp4));
-		var tmp6 = React.createElement("hr",{ });
-		var tmp7 = React.createElement("b","0");
-		var tmp8 = React.createElement("div",{ className : "footer"},[tmp7," task(s) left"]);
-		return React.createElement("div",{ style : { margin : "10px"}, className : "app"},[tmp2,tmp3,tmp5,tmp6,tmp8]);
+		var tmp = [].concat.apply([], [React.createElement.apply(this,["div",{ className : "header"}].concat([].concat.apply([], [React.createElement("input",{ ref : "input", placeholder : "Enter new task description"}),React.createElement.apply(this,["button",{ onClick : $bind(this,this.addItem), className : "button-add"}].concat([].concat.apply([], ["+"])))]))),React.createElement("hr",{ }),React.createElement(view_TodoList,react_template_Attributes.combine({ className : "list", ref : $bind(this,this.mountList)},react_template_Attributes.attrs(listProps))),React.createElement("hr",{ }),React.createElement.apply(this,["div",{ className : "footer"}].concat([].concat.apply([], [React.createElement.apply(this,["b",{ }].concat([].concat.apply([], [unchecked])))," task(s) left"])))]);
+		var tmp1 = ["div",{ style : { margin : "10px"}, className : "app"}].concat(tmp);
+		return React.createElement.apply(this,tmp1);
 	}
 	,mountList: function(comp) {
 		console.log("List mounted " + Std.string(comp.props));
@@ -614,14 +607,15 @@ view_TodoList.__super__ = React.Component;
 view_TodoList.prototype = $extend(React.Component.prototype,{
 	render: function() {
 		var style = { padding : this.props.padding};
-		return React.createElement("ul",{ className : this.props.className, style : style, onClick : $bind(this,this.toggleChecked)},[this.createChildren()]);
+		var tmp = ["ul",{ className : this.props.className, style : style, onClick : $bind(this,this.toggleChecked)}].concat([].concat.apply([], [this.createChildren()]));
+		return React.createElement.apply(this,tmp);
 	}
 	,createChildren: function() {
 		var t = this.props.data;
 		if(t != null) {
-			return t.map(function(entry) {
+			return [].concat.apply([], t.map(function(entry) {
 				return React.createElement(view_TodoListItem,{ key : entry.id, data : entry, padding : "5px"});
-			});
+			}));
 		} else {
 			return [];
 		}
@@ -648,7 +642,10 @@ view_TodoListItem.prototype = $extend(React.Component.prototype,{
 		var entry = this.props.data;
 		this.checked = entry.checked;
 		var id = "item-" + entry.id;
-		return React.createElement("li",{ id : id, className : this.checked ? "checked" : "", style : style},[entry.label]);
+		var tmp = this.checked ? "checked" : "";
+		var tmp1 = [].concat.apply([], [entry.label]);
+		var tmp2 = ["li",{ id : id, className : tmp, style : style}].concat(tmp1);
+		return React.createElement.apply(this,tmp2);
 	}
 });
 var $_, $fid = 0;
