@@ -322,7 +322,7 @@ class Parser {
 					switch attrs.expr {
 						case EObjectDecl([]):
 							emptyAttrs = true;
-							attrs = macro { };
+							attrs = macro ({ }:Dynamic);
 						default:
 					}
 
@@ -346,7 +346,7 @@ class Parser {
 					exprList.push(macro @:pos(pos.pos) $i{ident} = $el);
 
 				case Block.CustomElement(name, arguments, pos):
-					var attrs = arguments.length > 0 ? arguments[0] : macro @:pos(pos.pos) {};
+					var attrs = arguments.length > 0 ? arguments[0] : macro @:pos(pos.pos) ({ }:Dynamic);
 					var applyCall:Expr;
 					var childs = createExprList(item.children);
 
