@@ -331,7 +331,7 @@ class Parser {
 					if (data.content != null) childs.insert(0, data.content);
 
 					if (childs.length > 0)
-						applyCall = (macro untyped(react.React.createElement.apply)(this, [ ${tag}, ${attrs} ].concat(untyped __js__('[].concat.apply([], {0})', [$a{childs}]))));
+						applyCall = (macro untyped(react.React.createElement.apply)(untyped __js__('this'), [ ${tag}, ${attrs} ].concat(untyped __js__('[].concat.apply([], {0})', [$a{childs}]))));
 					else
 						applyCall = (macro react.React.createElement(${tag}, ${attrs}));
 							
@@ -351,7 +351,7 @@ class Parser {
 					var childs = createExprList(item.children);
 
 					if (childs.length > 0)
-						applyCall = (macro untyped(react.React.createElement.apply)(this, [ $i{name}, ${attrs} ].concat(untyped __js__('[].concat.apply([], {0})', [$a{childs}]))));
+						applyCall = (macro untyped(react.React.createElement.apply)((untyped __js__('this')), [ $i{name}, ${attrs} ].concat(untyped __js__('[].concat.apply([], {0})', [$a{childs}]))));
 					else
 						applyCall = (macro react.React.createElement($i{name}, ${attrs}));
 							
