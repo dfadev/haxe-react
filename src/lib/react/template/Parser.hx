@@ -90,10 +90,12 @@ class Parser {
 			case FieldType.FFun(func):
 				lines = new Lines();
 				isTemplate = false;
-				parseFunction(func.expr);
-				if (isTemplate) {
-					func.expr = yieldExpr(func.expr);
-					yieldSubExpr(func.expr);
+				if (func.expr != null) {
+					parseFunction(func.expr);
+					if (isTemplate) {
+						func.expr = yieldExpr(func.expr);
+						yieldSubExpr(func.expr);
+					}
 				}
 				field;
 			default: field;
